@@ -1,6 +1,6 @@
 {
   "app": "早安廚房",
-  "updated": "2026-11-27T15:14:21.699Z",
+  "updated": "2026-11-27T15:30:28.093Z",
   "recipes": [
     {
       "id": "french-toast",
@@ -267,24 +267,24 @@
       "level": "簡單",
       "ingredients": [
         {
-          "name": "蛋1顆",
-          "qty": null,
-          "unit": ""
+          "name": "蛋",
+          "qty": 1,
+          "unit": "顆"
         },
         {
-          "name": "草莓果醬少許",
+          "name": "草莓果醬",
           "qty": null,
-          "unit": ""
+          "unit": "少許"
         },
         {
-          "name": "肉鬆少許",
+          "name": "肉鬆",
           "qty": null,
-          "unit": ""
+          "unit": "少許"
         },
         {
-          "name": "土司2片",
-          "qty": null,
-          "unit": ""
+          "name": "土司",
+          "qty": 2,
+          "unit": "片"
         }
       ],
       "steps": [
