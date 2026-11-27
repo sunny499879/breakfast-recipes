@@ -1,6 +1,6 @@
 {
   "app": "早安廚房",
-  "updated": "2026-11-27T15:36:48.702Z",
+  "updated": "2026-11-27T15:44:32.166Z",
   "recipes": [
     {
       "id": "french-toast",
@@ -267,7 +267,7 @@
       "level": "簡單",
       "ingredients": [
         {
-          "name": "蛋",
+          "name": "雞蛋",
           "qty": 1,
           "unit": "顆"
         },
