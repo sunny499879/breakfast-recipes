@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FFF6E9">
+<title>早安廚房｜簡單早餐食譜</title>
+<style>
+  :root{
+    --bg:#FFF6E9; --card:#FFFFFF; --ink:#3A2E25; --muted:#8A7B6E;
+    --accent:#E8833A; --accent-soft:#FCE3CF; --line:#EEDFCF; --ok:#5B9A68;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;line-height:1.6}
+  header{padding:28px 20px 12px;max-width:960px;margin:0 auto}
+  h1{margin:0;font-size:28px;letter-spacing:1px}
+  .sub{margin:4px 0 0;color:var(--muted)}
+  main{max-width:960px;margin:0 auto;padding:0 20px 60px}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+  .toolbar input{flex:1 1 220px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:16px;background:#fff}
+  .btn{border:none;border-radius:12px;padding:12px 16px;font-size:15px;cursor:pointer;background:var(--accent);color:#fff;font-weight:600}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;color:var(--ink)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .card{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--line);cursor:pointer;transition:transform .15s, box-shadow .15s;position:relative}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(58,46,37,.08)}
+  .ph{aspect-ratio:16/10;background:repeating-linear-gradient(45deg,#F7EBDD,#F7EBDD 10px,#F3E4D3 10px,#F3E4D3 20px);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+  .card-body{padding:14px 16px 16px}
+  .card h3{margin:0 0 6px;font-size:18px}
+  .meta{display:flex;gap:10px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+  .tag{background:var(--accent-soft);color:#A4521A;border-radius:6px;padding:1px 8px;font-size:12px}
+  .fav{position:absolute;top:10px;right:10px;background:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .empty{color:var(--muted);text-align:center;padding:40px 0}
+
+  /* 詳細頁 */
+  .overlay{position:fixed;inset:0;background:rgba(40,30,20,.45);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .overlay.show{display:flex}
+  .sheet{background:#fff;width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:0 0 30px}
+  @media(min-width:700px){.overlay{align-items:center}.sheet{border-radius:20px}}
+  .sheet .ph{aspect-ratio:16/8}
+  .sheet-inner{padding:18px 22px}
+  .sheet h2{margin:0 0 6px}
+  .sheet{position:relative}
+  .close{position:absolute;top:12px;right:12px;background:#fff;border:1px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;z-index:2}
+  .serv{display:flex;align-items:center;gap:10px;margin:14px 0;background:var(--bg);padding:10px 14px;border-radius:12px}
+  .serv button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:18px;cursor:pointer}
+  .serv b{min-width:24px;text-align:center;font-size:18px}
+  h4{margin:18px 0 8px;font-size:16px;border-left:4px solid var(--accent);padding-left:8px}
+  ul.ing{list-style:none;padding:0;margin:0}
+  ul.ing li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line)}
+  ul.ing li label{display:flex;gap:8px;align-items:center;cursor:pointer}
+  ul.ing li.done span{text-decoration:line-through;color:var(--muted)}
+  ol.steps{padding-left:22px;margin:0}
+  ol.steps li{margin-bottom:10px}
+  .tip{background:#F1F7F2;border-radius:12px;padding:10px 14px;color:#3E6B48;font-size:14px;margin-top:14px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍳 早安廚房</h1>
+  <p class="sub">15 分鐘內搞定的簡單早餐食譜</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="搜尋食譜或食材，例如：蛋、吐司">
+    <button class="btn" id="randomBtn">🎲 今天吃什麼？</button>
+    <button class="btn ghost" id="favBtn">♡ 我的收藏</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<footer>早安廚房 v1.0 ・ 份量可自由調整 ・ 收藏只存在這台裝置的瀏覽器</footer>
+
+<script>
+/* ===== 食譜資料：要新增食譜，照同樣格式往下加一筆 ===== */
+const RECIPES = [
+  {
+    id: "french-toast", name: "法式吐司", time: 10, level: "簡單", type: "甜",
+    servings: 1,
+    ingredients: [
+      { name: "吐司", qty: 2, unit: "片" },
+      { name: "雞蛋", qty: 1, unit: "顆" },
+      { name: "牛奶", qty: 50, unit: "ml" },
+      { name: "奶油", qty: 5, unit: "g" },
+      { name: "蜂蜜或楓糖", qty: 1, unit: "大匙" }
+    ],
+    steps: [
+      "雞蛋打散，加入牛奶攪拌均勻。",
+      "吐司兩面各浸入蛋液約 10 秒。",
+      "平底鍋中小火融化奶油，放入吐司。",
+      "每面煎約 2 分鐘至金黃。",
+      "盛盤，淋上蜂蜜或楓糖。"
+    ],
+    tip: "吐司放隔夜、稍微乾一點，比較吸蛋液、不容易破。"
+  },
+  {
+    id: "ham-cheese-egg", name: "火腿起司蛋吐司", time: 8, level: "簡單", type: "鹹",
+    servings: 1,
+    ingredients: [
+      { name: "吐司", qty: 2, unit: "片" },
+      { name: "雞蛋", qty: 1, unit: "顆" },
+      { name: "火腿", qty: 1, unit: "片" },
+      { name: "起司片", qty: 1, unit: "片" },
+      { name: "沙拉油", qty: 1, unit: "小匙" }
+    ],
+    steps: [
+      "吐司放進烤麵包機烤至微脆。",
+      "平底鍋加油，煎一顆荷包蛋。",
+      "火腿片放入鍋中兩面各煎 30 秒。",
+      "吐司依序疊上起司、火腿、荷包蛋，再蓋上另一片吐司。",
+      "斜切對半即可。"
+    ],
+    tip: "起司放在熱吐司上會微微融化，口感更好。"
+  },
+  {
+    id: "oat-yogurt", name: "燕麥優格杯", time: 5, level: "簡單", type: "甜",
+    servings: 1,
+    ingredients: [
+      { name: "無糖優格", qty: 150, unit: "g" },
+      { name: "即食燕麥", qty: 30, unit: "g" },
+      { name: "香蕉", qty: 0.5, unit: "根" },
+      { name: "藍莓或當季水果", qty: 50, unit: "g" },
+      { name: "蜂蜜", qty: 1, unit: "小匙" }
+    ],
+    steps: [
+      "香蕉切片、水果洗淨備用。",
+      "杯中先放一半優格，鋪上一半燕麥。",
+      "重複一次優格和燕麥。",
+      "最上層放水果，淋上蜂蜜。"
+    ],
+    tip: "前一晚做好放冰箱，燕麥會吸收水分變軟，早上直接吃。"
+  },
+  {
+    id: "egg-pancake", name: "蔥花蛋餅", time: 10, level: "簡單", type: "鹹",
+    servings: 1,
+    ingredients: [
+      { name: "市售冷凍蛋餅皮", qty: 1, unit: "張" },
+      { name: "雞蛋", qty: 1, unit: "顆" },
+      { name: "青蔥", qty: 1, unit: "根" },
+      { name: "鹽", qty: 0.25, unit: "小匙" },
+      { name: "沙拉油", qty: 1, unit: "小匙" }
+    ],
+    steps: [
+      "青蔥切成蔥花，和雞蛋、鹽一起打散。",
+      "平底鍋加油，中火倒入蛋液。",
+      "蛋液半熟時，蓋上蛋餅皮（不用退冰）。",
+      "約 1 分鐘後翻面，再煎 1–2 分鐘至餅皮微焦。",
+      "捲起切段，可沾醬油膏。"
+    ],
+    tip: "加一片起司或玉米粒，就是起司蛋餅、玉米蛋餅。"
+  },
+  {
+    id: "banana-pancake", name: "香蕉鬆餅", time: 15, level: "中等", type: "甜",
+    servings: 2,
+    ingredients: [
+      { name: "熟香蕉", qty: 1, unit: "根" },
+      { name: "雞蛋", qty: 1, unit: "顆" },
+      { name: "鬆餅粉", qty: 100, unit: "g" },
+      { name: "牛奶", qty: 80, unit: "ml" },
+      { name: "奶油", qty: 5, unit: "g" }
+    ],
+    steps: [
+      "香蕉用叉子壓成泥。",
+      "加入雞蛋、牛奶拌勻，再加入鬆餅粉拌到沒有粉粒。",
+      "平底鍋小火抹薄薄一層奶油。",
+      "每次倒入約一大湯匙麵糊，表面冒泡泡時翻面。",
+      "兩面金黃即可起鍋。"
+    ],
+    tip: "香蕉越熟越甜，表皮有黑點的最適合。"
+  },
+  {
+    id: "avocado-toast", name: "酪梨蛋吐司", time: 10, level: "簡單", type: "鹹",
+    servings: 1,
+    ingredients: [
+      { name: "全麥吐司", qty: 1, unit: "片" },
+      { name: "熟酪梨", qty: 0.5, unit: "顆" },
+      { name: "雞蛋", qty: 1, unit: "顆" },
+      { name: "檸檬汁", qty: 1, unit: "小匙" },
+      { name: "鹽與黑胡椒", qty: 1, unit: "少許" }
+    ],
+    steps: [
+      "雞蛋放入滾水煮 7 分鐘，泡冷水後剝殼切片。",
+      "酪梨壓成泥，加檸檬汁、鹽拌勻。",
+      "吐司烤至微脆，抹上酪梨泥。",
+      "鋪上蛋片，撒黑胡椒。"
+    ],
+    tip: "檸檬汁可以防止酪梨變黑。"
+  }
+];
+
+/* ===== 收藏（存在瀏覽器，失敗也不影響使用） ===== */
+let favs = [];
+try { favs = JSON.parse(localStorage.getItem("breakfast-favs") || "[]"); } catch(e) { favs = []; }
+function saveFavs(){ try { localStorage.setItem("breakfast-favs", JSON.stringify(favs)); } catch(e) {} }
+
+/* ===== 狀態 ===== */
+const FILTERS = ["全部", "鹹", "甜", "10 分鐘內"];
+let filter = "全部", keyword = "", onlyFav = false;
+
+const $ = s => document.querySelector(s);
+const grid = $("#grid"), chips = $("#chips");
+
+function renderChips(){
+  chips.innerHTML = FILTERS.map(f =>
+    `<button class="chip ${f===filter?'on':''}" data-f="${f}">${f}</button>`).join("");
+}
+chips.addEventListener("click", e => {
+  const f = e.target.dataset.f; if(!f) return;
+  filter = f; renderChips(); renderGrid();
+});
+
+function match(r){
+  if(onlyFav && !favs.includes(r.id)) return false;
+  if(filter==="鹹" && r.type!=="鹹") return false;
+  if(filter==="甜" && r.type!=="甜") return false;
+  if(filter==="10 分鐘內" && r.time>10) return false;
+  if(keyword){
+    const text = r.name + r.ingredients.map(i=>i.name).join("");
+    if(!text.includes(keyword)) return false;
+  }
+  return true;
+}
+
+function renderGrid(){
+  const list = RECIPES.filter(match);
+  if(!list.length){
+    grid.innerHTML = `<p class="empty">${onlyFav ? "還沒有收藏，點卡片右上角的 ♡ 加入收藏" : "找不到符合的食譜"}</p>`;
+    return;
+  }
+  grid.innerHTML = list.map(r => `
+    <div class="card" data-id="${r.id}">
+      <button class="fav" data-fav="${r.id}" aria-label="收藏">${favs.includes(r.id)?'❤️':'🤍'}</button>
+      <div class="ph">圖片位置</div>
+      <div class="card-body">
+        <h3>${r.name}</h3>
+        <div class="meta">
+          <span>⏱ ${r.time} 分鐘</span><span>👤 ${r.servings} 人份</span>
+          <span class="tag">${r.type}</span><span class="tag">${r.level}</span>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+grid.addEventListener("click", e => {
+  const favId = e.target.dataset.fav;
+  if(favId){
+    e.stopPropagation();
+    favs = favs.includes(favId) ? favs.filter(x=>x!==favId) : [...favs, favId];
+    saveFavs(); renderGrid(); return;
+  }
+  const card = e.target.closest(".card");
+  if(card) openRecipe(card.dataset.id);
+});
+
+$("#q").addEventListener("input", e => { keyword = e.target.value.trim(); renderGrid(); });
+$("#favBtn").addEventListener("click", () => {
+  onlyFav = !onlyFav;
+  $("#favBtn").textContent = onlyFav ? "← 全部食譜" : "♡ 我的收藏";
+  renderGrid();
+});
+$("#randomBtn").addEventListener("click", () => {
+  const r = RECIPES[Math.floor(Math.random()*RECIPES.length)];
+  openRecipe(r.id);
+});
+
+/* ===== 詳細頁 ===== */
+let current = null, people = 1;
+function fmt(n){
+  const v = Math.round(n*100)/100;
+  return Number.isInteger(v) ? v : v.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");
+}
+function openRecipe(id){
+  current = RECIPES.find(r=>r.id===id);
+  people = current.servings;
+  renderSheet();
+  $("#overlay").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeSheet(){
+  $("#overlay").classList.remove("show");
+  document.body.style.overflow = "";
+}
+function renderSheet(){
+  const r = current, ratio = people / r.servings;
+  $("#sheet").innerHTML = `
+    <button class="close" id="closeBtn" aria-label="關閉">✕</button>
+    <div class="ph">圖片位置</div>
+    <div class="sheet-inner">
+      <h2>${r.name}</h2>
+      <div class="meta"><span>⏱ ${r.time} 分鐘</span><span class="tag">${r.type}</span><span class="tag">${r.level}</span></div>
+      <div class="serv">份量
+        <button id="minus">−</button><b>${people}</b><button id="plus">＋</button> 人份
+      </div>
+      <h4>食材（打勾＝已備好）</h4>
+      <ul class="ing">
+        ${r.ingredients.map((i,idx)=>`
+          <li><label><input type="checkbox" data-i="${idx}"><span>${i.name}</span></label>
+          <span>${i.unit==="少許" ? "少許" : fmt(i.qty*ratio)+" "+i.unit}</span></li>`).join("")}
+      </ul>
+      <h4>步驟</h4>
+      <ol class="steps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      ${r.tip ? `<div class="tip">💡 小撇步：${r.tip}</div>` : ""}
+    </div>`;
+  $("#closeBtn").onclick = closeSheet;
+  $("#minus").onclick = () => { if(people>1){ people--; renderSheet(); } };
+  $("#plus").onclick  = () => { if(people<10){ people++; renderSheet(); } };
+  $("#sheet").querySelectorAll("input[type=checkbox]").forEach(cb =>
+    cb.onchange = () => cb.closest("li").classList.toggle("done", cb.checked));
+}
+$("#overlay").addEventListener("click", e => { if(e.target.id==="overlay") closeSheet(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeSheet(); });
+
+renderChips(); renderGrid();
+</script>
+</body>
+</html>
