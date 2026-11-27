@@ -30,7 +30,8 @@
   .card{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--line);cursor:pointer;transition:transform .15s, box-shadow .15s;position:relative}
   .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(58,46,37,.08)}
   .ph{aspect-ratio:16/10;background:repeating-linear-gradient(45deg,#F7EBDD,#F7EBDD 10px,#F3E4D3 10px,#F3E4D3 20px);
-    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;position:relative;overflow:hidden}
+  .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .card-body{padding:14px 16px 16px}
   .card h3{margin:0 0 6px;font-size:18px}
   .meta{display:flex;gap:10px;color:var(--muted);font-size:13px;flex-wrap:wrap}
@@ -83,7 +84,7 @@
   <div class="sheet" id="sheet"></div>
 </div>
 
-<footer>早安廚房 v1.0 ・ 份量可自由調整 ・ 收藏只存在這台裝置的瀏覽器</footer>
+<footer>早安廚房 v1.1 ・ 份量可自由調整 ・ 收藏只存在這台裝置的瀏覽器</footer>
 
 <script>
 /* ===== 食譜資料：要新增食譜，照同樣格式往下加一筆 ===== */
@@ -202,6 +203,11 @@ const RECIPES = [
   }
 ];
 
+/* ===== 照片：放在 images 資料夾，檔名＝食譜 id + .jpg（例：images/french-toast.jpg）；找不到就顯示「圖片位置」 ===== */
+function photo(r){
+  return `<div class="ph"><span>圖片位置</span><img src="images/${r.img || r.id + '.jpg'}" alt="${r.name}" loading="lazy" onerror="this.remove()"></div>`;
+}
+
 /* ===== 收藏（存在瀏覽器，失敗也不影響使用） ===== */
 let favs = [];
 try { favs = JSON.parse(localStorage.getItem("breakfast-favs") || "[]"); } catch(e) { favs = []; }
@@ -244,7 +250,7 @@ function renderGrid(){
   grid.innerHTML = list.map(r => `
     <div class="card" data-id="${r.id}">
       <button class="fav" data-fav="${r.id}" aria-label="收藏">${favs.includes(r.id)?'❤️':'🤍'}</button>
-      <div class="ph">圖片位置</div>
+      ${photo(r)}
       <div class="card-body">
         <h3>${r.name}</h3>
         <div class="meta">
@@ -298,7 +304,7 @@ function renderSheet(){
   const r = current, ratio = people / r.servings;
   $("#sheet").innerHTML = `
     <button class="close" id="closeBtn" aria-label="關閉">✕</button>
-    <div class="ph">圖片位置</div>
+    ${photo(r)}
     <div class="sheet-inner">
       <h2>${r.name}</h2>
       <div class="meta"><span>⏱ ${r.time} 分鐘</span><span class="tag">${r.type}</span><span class="tag">${r.level}</span></div>
